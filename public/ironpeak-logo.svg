@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ipRedPrimary" x1="50" y1="8" x2="20" y2="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff2a5f" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+    <linearGradient id="ipRedLight" x1="50" y1="8" x2="80" y2="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff4d79" />
+      <stop offset="60%" stop-color="#e11d48" />
+      <stop offset="100%" stop-color="#9f1239" />
+    </linearGradient>
+    <linearGradient id="ipCarbonDark" x1="50" y1="50" x2="50" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1f2328" />
+      <stop offset="100%" stop-color="#0c0e10" />
+    </linearGradient>
+    <linearGradient id="ipCarbonLight" x1="20" y1="60" x2="80" y2="85" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#323842" />
+      <stop offset="100%" stop-color="#16181b" />
+    </linearGradient>
+  </defs>
+
+  <!-- Soaring Peak -->
+  <polygon points="50,8 18,62 50,48" fill="url(#ipRedPrimary)" />
+  <polygon points="50,8 82,62 50,48" fill="url(#ipRedLight)" />
+  <line x1="50" y1="8" x2="50" y2="48" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+
+  <!-- Core Diamond Power Node -->
+  <polygon points="50,38 60,52 50,64 40,52" fill="#ffffff" opacity="0.95" />
+  <polygon points="50,43 56,52 50,60 44,52" fill="#e11d48" />
+
+  <!-- Iron Strength Chevrons -->
+  <polygon points="14,68 50,88 50,74 24,58" fill="url(#ipCarbonLight)" />
+  <polygon points="86,68 50,88 50,74 76,58" fill="url(#ipCarbonDark)" />
+  <polygon points="50,94 40,88 50,83 60,88" fill="#e11d48" />
+</svg>
