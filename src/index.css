@@ -96,26 +96,27 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+  color: inherit;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Global input dark theme */
 input, textarea, select {
-  color: var(--text-main);
-  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-card);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--text-light);
+  color: #94a3b8 !important;
   opacity: 1;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--accent-red);
-  box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.18);
 }
 
 option {

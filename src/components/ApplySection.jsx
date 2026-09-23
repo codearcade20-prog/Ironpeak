@@ -302,10 +302,11 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         }
 
         .plan-select-tile {
-          border: 1px solid var(--border-card);
+          border: 1px solid rgba(255, 255, 255, 0.14);
           border-radius: var(--radius-md);
           padding: 14px 10px;
-          background-color: rgba(255,255,255,0.04);
+          background-color: rgba(255, 255, 255, 0.06);
+          color: #ffffff;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -315,15 +316,15 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         }
 
         .plan-select-tile:hover {
-          border-color: var(--border-light);
-          background-color: rgba(255,255,255,0.07);
+          border-color: rgba(255, 255, 255, 0.28);
+          background-color: rgba(255, 255, 255, 0.12);
           transform: translateY(-2px);
         }
 
         .plan-select-tile.active {
           border-color: var(--accent-red);
-          background-color: rgba(255, 42, 95, 0.1);
-          box-shadow: 0 4px 14px rgba(255, 42, 95, 0.2);
+          background: linear-gradient(135deg, rgba(255, 42, 95, 0.18) 0%, rgba(217, 27, 75, 0.1) 100%);
+          box-shadow: 0 4px 16px rgba(255, 42, 95, 0.3);
         }
 
         .tile-top {
@@ -334,34 +335,36 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         }
 
         .tile-name {
-          font-size: 0.85rem;
-          color: var(--text-main);
+          font-size: 0.88rem;
+          font-weight: 700;
+          color: #ffffff;
         }
 
         .tile-popular-badge {
-          font-size: 0.6rem;
-          font-weight: 700;
+          font-size: 0.62rem;
+          font-weight: 800;
           background: var(--accent-red);
           color: #ffffff;
-          padding: 1px 6px;
+          padding: 1px 7px;
           border-radius: var(--radius-full);
+          letter-spacing: 0.04em;
         }
 
         .tile-price {
           font-family: var(--font-heading);
-          font-size: 1.15rem;
+          font-size: 1.2rem;
           font-weight: 800;
-          color: var(--text-main);
+          color: #ffffff;
           margin-bottom: 2px;
         }
 
         .plan-select-tile.active .tile-price {
-          color: var(--accent-red);
+          color: #ff577d;
         }
 
         .tile-duration {
-          font-size: 0.72rem;
-          color: var(--text-muted);
+          font-size: 0.74rem;
+          color: #cbd5e1;
         }
 
         .form-grid-two {
@@ -379,7 +382,7 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         .form-input-block label {
           font-size: 0.82rem;
           font-weight: 700;
-          color: var(--text-main);
+          color: #f8fafc;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -388,7 +391,7 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         .optional-tag {
           font-weight: 500;
           font-size: 0.72rem;
-          color: var(--text-light);
+          color: #94a3b8;
         }
 
         .input-with-icon {
@@ -400,7 +403,7 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         .input-icon {
           position: absolute;
           left: 14px;
-          color: var(--text-light);
+          color: #94a3b8;
           pointer-events: none;
         }
 
@@ -409,13 +412,17 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
           width: 100%;
           padding: 12px 14px 12px 40px;
           border-radius: var(--radius-md);
-          border: 1px solid var(--border-card);
-          background-color: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background-color: rgba(12, 14, 18, 0.65);
           font-family: var(--font-body);
-          font-size: 0.9rem;
-          color: var(--text-main);
+          font-size: 0.92rem;
+          color: #ffffff !important;
           outline: none;
           transition: all 0.2s ease;
+        }
+
+        .input-with-icon input::placeholder {
+          color: #94a3b8 !important;
         }
 
         .timing-select {
@@ -426,8 +433,8 @@ export default function ApplySection({ preselectedPlan = 'Standard' }) {
         .timing-select:focus,
         .textarea-wrap textarea:focus {
           border-color: var(--accent-red);
-          background-color: rgba(255,255,255,0.07);
-          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.12);
+          background-color: rgba(12, 14, 18, 0.9);
+          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.2);
         }
 
         .textarea-wrap {

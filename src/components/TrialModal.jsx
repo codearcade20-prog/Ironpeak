@@ -261,53 +261,67 @@ export default function TrialModal({ isOpen, onClose, defaultPlan = 'Basic' }) {
         }
 
         .plan-toggle-pill {
-          padding: 8px 4px;
+          padding: 10px 6px;
           border-radius: var(--radius-md);
-          border: 1px solid var(--border-card);
-          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          background: rgba(255, 255, 255, 0.08);
+          color: #ffffff;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 2px;
+          gap: 3px;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
+        .plan-toggle-pill:hover {
+          background: rgba(255, 255, 255, 0.14);
+          border-color: rgba(255, 255, 255, 0.28);
+          transform: translateY(-1px);
+        }
+
         .plan-toggle-pill.selected {
-          background: var(--accent-red);
-          border-color: var(--accent-red);
+          background: linear-gradient(135deg, #ff2a5f 0%, #d91b4b 100%);
+          border-color: #ff2a5f;
           color: #ffffff;
+          box-shadow: 0 4px 14px rgba(255, 42, 95, 0.4);
         }
 
         .p-name {
-          font-size: 0.75rem;
+          font-size: 0.78rem;
           font-weight: 700;
+          color: #ffffff;
         }
 
         .p-price {
-          font-size: 0.7rem;
-          opacity: 0.85;
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #e2e8f0;
+        }
+
+        .plan-toggle-pill.selected .p-price {
+          color: #ffffff;
         }
 
         .plan-summary-box {
-          background: rgba(255, 42, 95, 0.1);
-          border: 1px solid rgba(255, 42, 95, 0.25);
+          background: rgba(255, 42, 95, 0.12);
+          border: 1px solid rgba(255, 42, 95, 0.3);
           border-radius: var(--radius-md);
-          padding: 10px 16px;
+          padding: 12px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
 
         .summary-lbl {
-          font-size: 0.8rem;
-          color: var(--text-muted);
+          font-size: 0.82rem;
+          color: #cbd5e1;
           font-weight: 600;
         }
 
         .summary-val {
-          font-size: 0.95rem;
-          color: var(--accent-red);
+          font-size: 1rem;
+          color: #ff577d;
           font-weight: 800;
         }
 
@@ -318,25 +332,31 @@ export default function TrialModal({ isOpen, onClose, defaultPlan = 'Basic' }) {
         }
 
         .field-block label {
-          font-size: 0.8rem;
+          font-size: 0.82rem;
           font-weight: 700;
-          color: var(--text-main);
+          color: #f8fafc;
         }
 
         .field-block input {
-          padding: 12px 14px;
+          padding: 12px 16px;
           border-radius: var(--radius-md);
-          border: 1px solid var(--border-card);
-          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background: rgba(12, 14, 18, 0.65);
           font-family: var(--font-body);
-          font-size: 0.9rem;
-          color: var(--text-main);
+          font-size: 0.92rem;
+          color: #ffffff !important;
           outline: none;
+          transition: all 0.2s ease;
+        }
+
+        .field-block input::placeholder {
+          color: #94a3b8 !important;
         }
 
         .field-block input:focus {
           border-color: var(--accent-red);
-          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.12);
+          background: rgba(12, 14, 18, 0.9);
+          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.2);
         }
 
         .modal-submit-btn {
