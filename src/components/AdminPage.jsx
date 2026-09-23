@@ -17,7 +17,10 @@ import {
   AlertCircle,
   ExternalLink,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Users,
+  Activity,
+  Layers
 } from 'lucide-react';
 import { 
   fetchMemberApplications, 
@@ -74,7 +77,7 @@ export default function AdminPage({ onBackToSite }) {
       if (elapsed < 500) {
         await new Promise(r => setTimeout(r, 500 - elapsed));
       }
-      setApplications(res.data);
+      setApplications(res.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -135,17 +138,32 @@ export default function AdminPage({ onBackToSite }) {
     }
   };
 
-  // 1. LOGIN SCREEN
+  // Helper for initial avatar
+  const getInitials = (name) => {
+    if (!name) return 'IP';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  // 1. LOGIN SCREEN (SLIGHT DARK LUXURY THEME)
   if (!isAuthenticated) {
     return (
       <div className="admin-login-wrapper">
+        <div className="admin-login-ambient-flare"></div>
+        <div className="admin-login-ambient-flare-2"></div>
+        
         <div className="admin-login-card">
           <div className="login-badge-header">
             <div className="login-logo-wrap">
-              <GymLogo size={64} glow={true} />
+              <GymLogo size={68} glow={true} />
+            </div>
+            <div className="login-sub-badge">
+              <ShieldCheck size={13} />
+              <span>SECURE DESK ACCESS</span>
             </div>
             <h2>IronPeak Admin Portal</h2>
-            <p>Enter desk administrator credentials to manage member applications.</p>
+            <p>Access member registrations, plan selections, and desk management console.</p>
           </div>
 
           <form onSubmit={handleLogin} className="login-form">
@@ -157,7 +175,7 @@ export default function AdminPage({ onBackToSite }) {
             )}
 
             <div className="field-group">
-              <label htmlFor="login-username">Username / Email</label>
+              <label htmlFor="login-username">Admin Email</label>
               <input
                 id="login-username"
                 type="email"
@@ -169,7 +187,7 @@ export default function AdminPage({ onBackToSite }) {
             </div>
 
             <div className="field-group">
-              <label htmlFor="login-password">Password</label>
+              <label htmlFor="login-password">Desk Key / Password</label>
               <input
                 id="login-password"
                 type="password"
@@ -185,20 +203,21 @@ export default function AdminPage({ onBackToSite }) {
                 type="button" 
                 onClick={fillDemoCreds} 
                 className="demo-autofill-btn"
+                title="Click to auto-fill demo credentials"
               >
-                <Sparkles size={13} />
+                <Sparkles size={13} className="sparkle-icon" />
                 <span>Autofill Demo: admin@ironpeak.com / admin@123</span>
               </button>
             </div>
 
-            <button type="submit" className="btn-primary login-submit-btn">
+            <button type="submit" className="login-submit-btn">
               <span>Sign In to Dashboard</span>
             </button>
           </form>
 
           <div className="login-footer-actions">
             <button onClick={onBackToSite} className="back-site-link">
-              <ArrowLeft size={14} />
+              <ArrowLeft size={15} />
               <span>Return to Public Website</span>
             </button>
           </div>
@@ -212,16 +231,44 @@ export default function AdminPage({ onBackToSite }) {
             align-items: center;
             justify-content: center;
             padding: 24px;
+            position: relative;
+            overflow: hidden;
+          }
+
+          .admin-login-ambient-flare {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 42, 95, 0.12) 0%, transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+          }
+
+          .admin-login-ambient-flare-2 {
+            position: absolute;
+            bottom: 10%;
+            right: 15%;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(217, 27, 75, 0.08) 0%, transparent 70%);
+            filter: blur(50px);
+            pointer-events: none;
           }
 
           .admin-login-card {
-            background: #ffffff;
-            border: 1px solid var(--border-card);
+            background: rgba(19, 22, 28, 0.88);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-xl);
             width: 100%;
-            max-width: 440px;
-            padding: 40px;
-            box-shadow: var(--shadow-lg);
+            max-width: 450px;
+            padding: 42px 36px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(255, 42, 95, 0.08);
+            position: relative;
+            z-index: 2;
           }
 
           .login-badge-header {
@@ -229,22 +276,34 @@ export default function AdminPage({ onBackToSite }) {
             margin-bottom: 28px;
           }
 
-          .lock-icon-wrap {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background-color: var(--bg-dark);
-            color: #ffffff;
-            display: flex;
+          .login-logo-wrap {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px auto;
+            margin-bottom: 14px;
+          }
+
+          .login-sub-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 42, 95, 0.12);
+            border: 1px solid rgba(255, 42, 95, 0.28);
+            color: #ff577d;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
           }
 
           .login-badge-header h2 {
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             color: var(--text-main);
-            margin-bottom: 6px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
           }
 
           .login-badge-header p {
@@ -260,12 +319,12 @@ export default function AdminPage({ onBackToSite }) {
           }
 
           .auth-error-banner {
-            background: #fff1f2;
-            color: #e11d48;
-            border: 1px solid #fecdd3;
+            background: rgba(225, 29, 72, 0.15);
+            color: #fda4af;
+            border: 1px solid rgba(225, 29, 72, 0.35);
             padding: 10px 14px;
             border-radius: var(--radius-md);
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -281,22 +340,30 @@ export default function AdminPage({ onBackToSite }) {
           .field-group label {
             font-size: 0.82rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: #e2e8f0;
+            letter-spacing: 0.02em;
           }
 
           .field-group input {
-            padding: 12px 14px;
+            padding: 12px 16px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--border-light);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 14, 18, 0.6);
+            color: #ffffff;
             font-family: var(--font-body);
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             outline: none;
             transition: all 0.2s ease;
           }
 
           .field-group input:focus {
-            border-color: var(--bg-dark);
-            box-shadow: 0 0 0 3px rgba(17, 19, 21, 0.08);
+            border-color: var(--accent-red);
+            background: rgba(12, 14, 18, 0.9);
+            box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.18);
+          }
+
+          .field-group input::placeholder {
+            color: #64748b;
           }
 
           .demo-helper-row {
@@ -307,52 +374,79 @@ export default function AdminPage({ onBackToSite }) {
           .demo-autofill-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: var(--accent-red-bg);
-            color: var(--accent-red);
+            gap: 7px;
+            background: rgba(255, 42, 95, 0.1);
+            color: #ff577d;
             font-size: 0.76rem;
             font-weight: 700;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: var(--radius-full);
-            border: 1px solid var(--accent-badge-border);
+            border: 1px solid rgba(255, 42, 95, 0.28);
+            transition: all 0.2s ease;
           }
 
           .demo-autofill-btn:hover {
-            opacity: 0.9;
+            background: rgba(255, 42, 95, 0.18);
+            border-color: rgba(255, 42, 95, 0.45);
+            transform: translateY(-1px);
+          }
+
+          .sparkle-icon {
+            color: #ff2a5f;
+            animation: pulseSparkle 2s infinite ease-in-out;
+          }
+
+          @keyframes pulseSparkle {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.15); }
           }
 
           .login-submit-btn {
             width: 100%;
             padding: 13px;
             font-size: 0.95rem;
-            margin-top: 4px;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ff2a5f 0%, #d91b4b 100%);
+            border-radius: var(--radius-md);
+            margin-top: 6px;
+            box-shadow: 0 6px 20px rgba(255, 42, 95, 0.35);
+            transition: all 0.2s ease;
+          }
+
+          .login-submit-btn:hover {
+            opacity: 0.95;
+            box-shadow: 0 8px 26px rgba(255, 42, 95, 0.5);
+            transform: translateY(-1px);
           }
 
           .login-footer-actions {
             margin-top: 24px;
             text-align: center;
-            border-top: 1px solid var(--border-light);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             padding-top: 18px;
           }
 
           .back-site-link {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-muted);
+            transition: all 0.2s ease;
           }
 
           .back-site-link:hover {
-            color: var(--text-main);
+            color: #ffffff;
+            transform: translateX(-2px);
           }
         `}</style>
       </div>
     );
   }
 
-  // 2. AUTHENTICATED ADMIN DASHBOARD
+  // 2. AUTHENTICATED ADMIN DASHBOARD (SLIGHT DARK LUXURY THEME)
   return (
     <div className="admin-portal-page">
       {/* Top Admin Navbar */}
@@ -360,7 +454,7 @@ export default function AdminPage({ onBackToSite }) {
         <div className="admin-nav-container">
           <div className="admin-brand-side">
             <button onClick={onBackToSite} className="admin-back-btn" title="Return to Public Site">
-              <ArrowLeft size={16} />
+              <ArrowLeft size={15} />
               <span>Public Website</span>
             </button>
             <GymLogo size={36} glow={true} />
@@ -371,10 +465,13 @@ export default function AdminPage({ onBackToSite }) {
           </div>
 
           <div className="admin-actions-side">
-            <span className="admin-user-tag">admin@ironpeak.com</span>
+            <div className="admin-user-pill">
+              <div className="user-online-dot"></div>
+              <span className="admin-user-tag">admin@ironpeak.com</span>
+            </div>
 
             <button onClick={handleLogout} className="admin-logout-btn" title="Sign out">
-              <LogOut size={16} />
+              <LogOut size={15} />
               <span>Sign Out</span>
             </button>
           </div>
@@ -385,10 +482,13 @@ export default function AdminPage({ onBackToSite }) {
       <main className="admin-main container">
         {/* Metric Summary Cards */}
         <div className="admin-metrics-row">
-          <div className="admin-metric-card">
-            <span className="m-label">Total Applications</span>
+          <div className="admin-metric-card card-total">
+            <div className="m-header">
+              <span className="m-label">Total Applications</span>
+              <Users size={16} className="m-icon icon-total" />
+            </div>
             <span className="m-val">{totalCount}</span>
-            <span className="m-sub">All time registrations</span>
+            <span className="m-sub">All time registrations recorded</span>
           </div>
 
           <div className="admin-metric-card card-interested">
@@ -397,7 +497,7 @@ export default function AdminPage({ onBackToSite }) {
               <CheckCircle2 size={16} className="m-icon green-icon" />
             </div>
             <span className="m-val green-val">{interestedCount}</span>
-            <span className="m-sub">Ready for tour or join</span>
+            <span className="m-sub">Ready for facility tour & joining</span>
           </div>
 
           <div className="admin-metric-card card-call-later">
@@ -406,7 +506,7 @@ export default function AdminPage({ onBackToSite }) {
               <Clock size={16} className="m-icon orange-icon" />
             </div>
             <span className="m-val orange-val">{callLaterCount}</span>
-            <span className="m-sub">Requires follow-up call</span>
+            <span className="m-sub">Scheduled follow-up phone calls</span>
           </div>
 
           <div className="admin-metric-card card-not-interested">
@@ -415,7 +515,7 @@ export default function AdminPage({ onBackToSite }) {
               <XCircle size={16} className="m-icon gray-icon" />
             </div>
             <span className="m-val gray-val">{notInterestedCount}</span>
-            <span className="m-sub">Declined / unreachable</span>
+            <span className="m-sub">Declined / unreachable applicants</span>
           </div>
         </div>
 
@@ -445,29 +545,29 @@ export default function AdminPage({ onBackToSite }) {
               >
                 <span>{st}</span>
                 {st === 'All' && <span className="tab-count">{totalCount}</span>}
-                {st === 'Interested' && <span className="tab-count">{interestedCount}</span>}
-                {st === 'Call Later' && <span className="tab-count">{callLaterCount}</span>}
-                {st === 'Not Interested' && <span className="tab-count">{notInterestedCount}</span>}
+                {st === 'Interested' && <span className="tab-count count-green">{interestedCount}</span>}
+                {st === 'Call Later' && <span className="tab-count count-orange">{callLaterCount}</span>}
+                {st === 'Not Interested' && <span className="tab-count count-gray">{notInterestedCount}</span>}
               </button>
             ))}
 
-            <button onClick={loadData} className="refresh-data-btn" title="Refresh Table">
+            <button onClick={loadData} className="refresh-data-btn" title="Refresh Applications">
               <RefreshCw size={15} className={loading ? 'spinning' : ''} />
             </button>
           </div>
         </div>
 
-        {/* Applications Table (Matches prompt specifications) */}
+        {/* Applications Table */}
         <div className="applications-table-wrapper">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Applicant Name</th>
+                <th>Applicant</th>
                 <th>Phone Number</th>
                 <th>Age</th>
                 <th>Selected Plan</th>
                 <th>Applied Date</th>
-                <th>Status</th>
+                <th>Status (Direct Sync)</th>
                 <th>Quick Actions</th>
               </tr>
             </thead>
@@ -475,15 +575,22 @@ export default function AdminPage({ onBackToSite }) {
               {filteredApps.length > 0 ? (
                 filteredApps.map((app) => (
                   <tr key={app.id} className="table-row">
-                    {/* Name */}
+                    {/* Name & Note */}
                     <td>
                       <div className="applicant-cell">
-                        <strong className="applicant-name">{app.name}</strong>
-                        {app.message && (
-                          <span className="applicant-note" title={app.message}>
-                            "{app.message}"
-                          </span>
-                        )}
+                        <div className="applicant-id-wrap">
+                          <div className="applicant-avatar">
+                            {getInitials(app.name)}
+                          </div>
+                          <div className="applicant-meta">
+                            <strong className="applicant-name">{app.name}</strong>
+                            {app.message && (
+                              <span className="applicant-note" title={app.message}>
+                                "{app.message}"
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </td>
 
@@ -520,8 +627,8 @@ export default function AdminPage({ onBackToSite }) {
                           className={`status-select status-${(app.status || 'Call Later').toLowerCase().replace(/\s+/g, '-')}`}
                         >
                           <option value="Interested">Interested</option>
-                          <option value="Not Interested">Not Interested</option>
                           <option value="Call Later">Call Later</option>
+                          <option value="Not Interested">Not Interested</option>
                         </select>
                       </div>
                     </td>
@@ -531,7 +638,7 @@ export default function AdminPage({ onBackToSite }) {
                       <div className="quick-actions-row">
                         <a 
                           href={`tel:${app.phone}`} 
-                          className="action-icon-btn" 
+                          className="action-icon-btn call-btn" 
                           title={`Call ${app.name}`}
                         >
                           <Phone size={14} />
@@ -553,9 +660,16 @@ export default function AdminPage({ onBackToSite }) {
                 <tr>
                   <td colSpan={7} className="empty-table-cell">
                     <div className="empty-state">
-                      <Search size={32} className="empty-icon" />
+                      <div className="empty-icon-wrap">
+                        <Search size={28} className="empty-icon" />
+                      </div>
                       <h4>No applications matched your criteria</h4>
-                      <p>Try clearing your search query or switching status filters.</p>
+                      <p>Try clearing your search query or switching your status filter.</p>
+                      {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} className="reset-filter-btn">
+                          Clear Search Filter
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -568,7 +682,7 @@ export default function AdminPage({ onBackToSite }) {
       {/* Live Toast Notification */}
       {toastMessage && (
         <div className="admin-toast">
-          <CheckCircle2 size={16} />
+          <CheckCircle2 size={16} className="toast-icon" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -577,19 +691,22 @@ export default function AdminPage({ onBackToSite }) {
       <LoadingSplashScreen 
         show={loading} 
         title="IRONPEAK DESK" 
-        subtitle="FETCHING MEMBER DATA FROM DATABASE..." 
+        subtitle="SYNCING LIVE MEMBER DATA FROM DATABASE..." 
       />
 
       <style>{`
         .admin-portal-page {
           min-height: 100vh;
           background-color: var(--bg-main);
+          color: var(--text-main);
           padding-bottom: 80px;
         }
 
+        /* Top Admin Navbar */
         .admin-top-nav {
-          background-color: #ffffff;
-          border-bottom: 1px solid var(--border-light);
+          background: rgba(12, 14, 18, 0.88);
+          backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
           padding: 14px 0;
           position: sticky;
           top: 0;
@@ -597,7 +714,7 @@ export default function AdminPage({ onBackToSite }) {
         }
 
         .admin-nav-container {
-          max-width: 1240px;
+          max-width: 1280px;
           margin: 0 auto;
           padding: 0 24px;
           display: flex;
@@ -618,28 +735,32 @@ export default function AdminPage({ onBackToSite }) {
           font-size: 0.82rem;
           font-weight: 600;
           color: var(--text-muted);
-          background: #f4f5f6;
-          padding: 6px 12px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 6px 14px;
           border-radius: var(--radius-full);
+          transition: all 0.2s ease;
         }
 
         .admin-back-btn:hover {
-          color: var(--text-main);
-          background: #e9ebed;
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.18);
         }
 
         .admin-title-wrap {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
         }
 
         .admin-pill-tag {
           font-size: 0.65rem;
           font-weight: 800;
-          background: var(--bg-dark);
-          color: #ffffff;
-          padding: 3px 8px;
+          background: rgba(255, 42, 95, 0.15);
+          border: 1px solid rgba(255, 42, 95, 0.35);
+          color: #ff577d;
+          padding: 3px 9px;
           border-radius: var(--radius-full);
           letter-spacing: 0.08em;
         }
@@ -647,7 +768,8 @@ export default function AdminPage({ onBackToSite }) {
         .admin-page-title {
           font-size: 1.25rem;
           font-weight: 800;
-          color: var(--text-main);
+          color: #ffffff;
+          letter-spacing: -0.01em;
         }
 
         .admin-actions-side {
@@ -656,8 +778,26 @@ export default function AdminPage({ onBackToSite }) {
           gap: 14px;
         }
 
+        .admin-user-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 6px 14px;
+          border-radius: var(--radius-full);
+        }
+
+        .user-online-dot {
+          width: 7px;
+          height: 7px;
+          background: #10b981;
+          border-radius: 50%;
+          box-shadow: 0 0 8px #10b981;
+        }
+
         .admin-user-tag {
-          font-size: 0.82rem;
+          font-size: 0.8rem;
           color: var(--text-muted);
           font-weight: 600;
         }
@@ -668,19 +808,25 @@ export default function AdminPage({ onBackToSite }) {
           gap: 6px;
           font-size: 0.82rem;
           font-weight: 600;
-          color: #e11d48;
-          background: #fff1f2;
+          color: #fb7185;
+          background: rgba(244, 63, 94, 0.1);
+          border: 1px solid rgba(244, 63, 94, 0.25);
           padding: 6px 14px;
           border-radius: var(--radius-full);
+          transition: all 0.2s ease;
         }
 
         .admin-logout-btn:hover {
-          background: #ffe4e6;
+          background: rgba(244, 63, 94, 0.2);
+          border-color: rgba(244, 63, 94, 0.4);
+          color: #ffffff;
         }
 
-        /* Main */
+        /* Main Container */
         .admin-main {
-          margin-top: 32px;
+          max-width: 1280px;
+          margin: 32px auto 0 auto;
+          padding: 0 24px;
         }
 
         /* Metrics */
@@ -692,51 +838,76 @@ export default function AdminPage({ onBackToSite }) {
         }
 
         .admin-metric-card {
-          background: #ffffff;
-          border: 1px solid var(--border-card);
+          background: rgba(19, 22, 28, 0.85);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: var(--radius-lg);
           padding: 20px 24px;
           display: flex;
           flex-direction: column;
-          box-shadow: var(--shadow-sm);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .admin-metric-card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(255, 255, 255, 0.15);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-total {
+          border-left: 3px solid #ff2a5f;
+        }
+
+        .card-interested {
+          border-left: 3px solid #10b981;
+        }
+
+        .card-call-later {
+          border-left: 3px solid #f59e0b;
+        }
+
+        .card-not-interested {
+          border-left: 3px solid #64748b;
         }
 
         .m-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          margin-bottom: 8px;
         }
 
         .m-label {
-          font-size: 0.75rem;
+          font-size: 0.74rem;
           text-transform: uppercase;
           letter-spacing: 0.08em;
           color: var(--text-light);
           font-weight: 700;
-          margin-bottom: 4px;
         }
+
+        .icon-total { color: #ff577d; }
+        .green-icon { color: #10b981; }
+        .orange-icon { color: #f59e0b; }
+        .gray-icon { color: #94a3b8; }
 
         .m-val {
           font-family: var(--font-heading);
-          font-size: 2.2rem;
+          font-size: 2.3rem;
           font-weight: 800;
-          color: var(--text-main);
+          color: #ffffff;
           letter-spacing: -0.02em;
           line-height: 1.1;
         }
 
-        .green-val { color: #059669; }
-        .orange-val { color: #d97706; }
-        .gray-val { color: #64748b; }
-
-        .green-icon { color: #059669; }
-        .orange-icon { color: #d97706; }
-        .gray-icon { color: #64748b; }
+        .green-val { color: #34d399; }
+        .orange-val { color: #fbbf24; }
+        .gray-val { color: #94a3b8; }
 
         .m-sub {
           font-size: 0.78rem;
           color: var(--text-muted);
-          margin-top: 4px;
+          margin-top: 6px;
         }
 
         /* Controls */
@@ -745,7 +916,7 @@ export default function AdminPage({ onBackToSite }) {
           align-items: center;
           justify-content: space-between;
           gap: 16px;
-          margin-bottom: 20px;
+          margin-bottom: 22px;
           flex-wrap: wrap;
         }
 
@@ -760,86 +931,129 @@ export default function AdminPage({ onBackToSite }) {
         .search-icon {
           position: absolute;
           left: 14px;
-          color: var(--text-light);
+          color: #64748b;
+          pointer-events: none;
         }
 
         .search-input-box input {
           width: 100%;
-          padding: 10px 38px 10px 38px;
+          padding: 10px 42px 10px 40px;
           border-radius: var(--radius-full);
-          border: 1px solid var(--border-light);
-          background: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(19, 22, 28, 0.9);
+          color: #ffffff;
           font-family: var(--font-body);
           font-size: 0.88rem;
           outline: none;
+          transition: all 0.2s ease;
         }
 
         .search-input-box input:focus {
-          border-color: var(--bg-dark);
-          box-shadow: 0 0 0 3px rgba(17, 19, 21, 0.08);
+          border-color: var(--accent-red);
+          box-shadow: 0 0 0 3px rgba(255, 42, 95, 0.18);
+        }
+
+        .search-input-box input::placeholder {
+          color: #64748b;
         }
 
         .clear-search-btn {
           position: absolute;
           right: 12px;
-          font-size: 0.75rem;
-          color: var(--text-light);
+          font-size: 0.74rem;
+          color: #94a3b8;
           font-weight: 600;
+          background: rgba(255, 255, 255, 0.08);
+          padding: 2px 8px;
+          border-radius: var(--radius-full);
+          transition: all 0.15s ease;
+        }
+
+        .clear-search-btn:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.16);
         }
 
         .filter-pill-group {
           display: flex;
           align-items: center;
           gap: 8px;
+          flex-wrap: wrap;
         }
 
         .filter-tab-pill {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 7px;
           padding: 7px 14px;
           border-radius: var(--radius-full);
           font-size: 0.82rem;
           font-weight: 600;
-          background: #ffffff;
-          border: 1px solid var(--border-light);
+          background: rgba(19, 22, 28, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           color: var(--text-muted);
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
-        .filter-tab-pill.active {
-          background: var(--bg-dark);
-          border-color: var(--bg-dark);
+        .filter-tab-pill:hover {
+          background: rgba(25, 29, 38, 0.9);
           color: #ffffff;
+          border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-tab-pill.active {
+          background: linear-gradient(135deg, #ff2a5f 0%, #e11d48 100%);
+          border-color: #ff2a5f;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(255, 42, 95, 0.35);
         }
 
         .tab-count {
-          background: rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.1);
           font-size: 0.72rem;
-          padding: 1px 6px;
+          padding: 1px 7px;
           border-radius: var(--radius-full);
+          color: var(--text-main);
+        }
+
+        .count-green {
+          color: #34d399;
+          background: rgba(16, 185, 129, 0.15);
+        }
+
+        .count-orange {
+          color: #fbbf24;
+          background: rgba(245, 158, 11, 0.15);
+        }
+
+        .count-gray {
+          color: #cbd5e1;
+          background: rgba(148, 163, 184, 0.15);
         }
 
         .filter-tab-pill.active .tab-count {
-          background: rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.25);
           color: #ffffff;
         }
 
         .refresh-data-btn {
-          width: 34px;
-          height: 34px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          border: 1px solid var(--border-light);
-          background: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(19, 22, 28, 0.8);
           display: flex;
           align-items: center;
           justify-content: center;
           color: var(--text-main);
+          transition: all 0.2s ease;
         }
 
         .refresh-data-btn:hover {
-          background: #f4f5f6;
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.2);
+          color: #ff577d;
         }
 
         .spinning {
@@ -853,11 +1067,12 @@ export default function AdminPage({ onBackToSite }) {
 
         /* Applications Table */
         .applications-table-wrapper {
-          background: #ffffff;
-          border: 1px solid var(--border-card);
+          background: rgba(19, 22, 28, 0.9);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: var(--radius-xl);
           overflow: hidden;
-          box-shadow: var(--shadow-sm);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
           margin-bottom: 30px;
         }
 
@@ -868,44 +1083,74 @@ export default function AdminPage({ onBackToSite }) {
         }
 
         .admin-table th {
-          background-color: #f8faf9;
-          padding: 14px 20px;
-          font-size: 0.75rem;
+          background: rgba(12, 14, 18, 0.9);
+          padding: 15px 22px;
+          font-size: 0.72rem;
           text-transform: uppercase;
           letter-spacing: 0.08em;
           color: var(--text-light);
           font-weight: 700;
-          border-bottom: 1px solid var(--border-light);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .admin-table td {
-          padding: 16px 20px;
-          border-bottom: 1px solid #f1f3f2;
+          padding: 16px 22px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
           font-size: 0.88rem;
           vertical-align: middle;
         }
 
+        .table-row {
+          transition: background-color 0.15s ease;
+        }
+
         .table-row:hover {
-          background-color: #fafbfb;
+          background-color: rgba(255, 255, 255, 0.03);
         }
 
         .applicant-cell {
+          display: flex;
+          align-items: center;
+        }
+
+        .applicant-id-wrap {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .applicant-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(255, 42, 95, 0.2) 0%, rgba(217, 27, 75, 0.1) 100%);
+          border: 1px solid rgba(255, 42, 95, 0.3);
+          color: #ff577d;
+          font-size: 0.78rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .applicant-meta {
           display: flex;
           flex-direction: column;
         }
 
         .applicant-name {
-          color: var(--text-main);
-          font-size: 0.95rem;
+          color: #ffffff;
+          font-size: 0.94rem;
           font-weight: 700;
         }
 
         .applicant-note {
-          font-size: 0.75rem;
+          font-size: 0.74rem;
           color: var(--text-muted);
           font-style: italic;
           margin-top: 2px;
-          max-width: 260px;
+          max-width: 240px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -915,30 +1160,52 @@ export default function AdminPage({ onBackToSite }) {
           font-family: monospace;
           font-size: 0.88rem;
           font-weight: 600;
-          color: var(--text-main);
+          color: #e2e8f0;
+          letter-spacing: 0.02em;
         }
 
         .age-badge {
-          background: #f4f5f6;
-          padding: 3px 8px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 3px 9px;
           border-radius: var(--radius-md);
           font-weight: 600;
           font-size: 0.8rem;
-          color: var(--text-main);
+          color: #e2e8f0;
         }
 
         .plan-chip {
           display: inline-block;
           font-size: 0.78rem;
           font-weight: 700;
-          padding: 4px 10px;
+          padding: 4px 12px;
           border-radius: var(--radius-full);
+          letter-spacing: 0.02em;
         }
 
-        .plan-basic { background: #f3f4f6; color: #374151; }
-        .plan-standard { background: var(--accent-red-bg); color: var(--accent-red); }
-        .plan-premium { background: #fef3c7; color: #b45309; }
-        .plan-annual { background: #111315; color: #ffffff; }
+        .plan-basic { 
+          background: rgba(148, 163, 184, 0.12); 
+          border: 1px solid rgba(148, 163, 184, 0.25);
+          color: #cbd5e1; 
+        }
+
+        .plan-standard { 
+          background: rgba(255, 42, 95, 0.15); 
+          border: 1px solid rgba(255, 42, 95, 0.35);
+          color: #ff577d; 
+        }
+
+        .plan-premium { 
+          background: rgba(245, 158, 11, 0.15); 
+          border: 1px solid rgba(245, 158, 11, 0.35);
+          color: #fbbf24; 
+        }
+
+        .plan-annual { 
+          background: rgba(168, 85, 247, 0.15); 
+          border: 1px solid rgba(168, 85, 247, 0.35);
+          color: #c084fc; 
+        }
 
         .date-cell {
           font-size: 0.82rem;
@@ -946,13 +1213,13 @@ export default function AdminPage({ onBackToSite }) {
           font-weight: 500;
         }
 
-        /* Status Dropdown (The Key Requirement) */
+        /* Status Dropdown */
         .status-dropdown-wrap {
           position: relative;
         }
 
         .status-select {
-          padding: 6px 12px;
+          padding: 6px 14px;
           border-radius: var(--radius-full);
           font-size: 0.8rem;
           font-weight: 700;
@@ -963,52 +1230,64 @@ export default function AdminPage({ onBackToSite }) {
           transition: all 0.2s ease;
         }
 
+        .status-select option {
+          background-color: #13161c;
+          color: #f8fafc;
+          padding: 8px;
+        }
+
         .status-interested {
-          background-color: #ecfdf5;
-          color: #047857;
-          border-color: #a7f3d0;
+          background-color: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+          border-color: rgba(16, 185, 129, 0.35);
         }
 
         .status-call-later {
-          background-color: #fffbeb;
-          color: #b45309;
-          border-color: #fde68a;
+          background-color: rgba(245, 158, 11, 0.15);
+          color: #fbbf24;
+          border-color: rgba(245, 158, 11, 0.35);
         }
 
         .status-not-interested {
-          background-color: #f3f4f6;
-          color: #4b5563;
-          border-color: #e5e7eb;
+          background-color: rgba(148, 163, 184, 0.12);
+          color: #94a3b8;
+          border-color: rgba(148, 163, 184, 0.25);
         }
 
         .quick-actions-row {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
         }
 
         .action-icon-btn {
-          width: 30px;
-          height: 30px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          background: #f4f5f6;
-          color: var(--text-main);
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #e2e8f0;
           display: flex;
           align-items: center;
           justify-content: center;
           transition: all 0.2s ease;
         }
 
-        .action-icon-btn:hover {
-          background: var(--bg-dark);
+        .call-btn:hover {
+          background: #ff2a5f;
+          border-color: #ff2a5f;
           color: #ffffff;
+          box-shadow: 0 0 12px rgba(255, 42, 95, 0.4);
         }
 
         .whatsapp-btn:hover {
           background: #25d366;
+          border-color: #25d366;
           color: #ffffff;
+          box-shadow: 0 0 12px rgba(37, 211, 102, 0.4);
         }
 
+        /* Empty State */
         .empty-table-cell {
           text-align: center;
           padding: 60px 20px !important;
@@ -1020,39 +1299,72 @@ export default function AdminPage({ onBackToSite }) {
           align-items: center;
         }
 
+        .empty-icon-wrap {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 14px;
+        }
+
         .empty-icon {
-          color: var(--text-light);
-          margin-bottom: 12px;
+          color: #64748b;
         }
 
         .empty-state h4 {
-          font-size: 1.1rem;
-          color: var(--text-main);
-          margin-bottom: 4px;
+          font-size: 1.15rem;
+          color: #ffffff;
+          margin-bottom: 6px;
         }
 
         .empty-state p {
           font-size: 0.85rem;
           color: var(--text-muted);
+          margin-bottom: 16px;
+        }
+
+        .reset-filter-btn {
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: #ff577d;
+          background: rgba(255, 42, 95, 0.1);
+          border: 1px solid rgba(255, 42, 95, 0.3);
+          padding: 6px 14px;
+          border-radius: var(--radius-full);
+          transition: all 0.2s ease;
+        }
+
+        .reset-filter-btn:hover {
+          background: rgba(255, 42, 95, 0.2);
         }
 
         /* Toast */
         .admin-toast {
           position: fixed;
-          bottom: 24px;
-          right: 24px;
-          background: var(--bg-dark);
+          bottom: 28px;
+          right: 28px;
+          background: rgba(19, 22, 28, 0.95);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 42, 95, 0.35);
           color: #ffffff;
-          padding: 12px 20px;
+          padding: 12px 22px;
           border-radius: var(--radius-full);
           display: flex;
           align-items: center;
           gap: 10px;
           font-size: 0.88rem;
           font-weight: 600;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 42, 95, 0.2);
           z-index: 1000;
-          animation: toastIn 0.2s ease-out;
+          animation: toastIn 0.25s ease-out;
+        }
+
+        .toast-icon {
+          color: #ff2a5f;
         }
 
         @keyframes toastIn {
@@ -1075,7 +1387,22 @@ export default function AdminPage({ onBackToSite }) {
             overflow-x: auto;
           }
           .admin-table {
-            min-width: 700px;
+            min-width: 760px;
+          }
+        }
+
+        @media (max-width: 500px) {
+          .admin-metrics-row {
+            grid-template-columns: 1fr;
+          }
+          .admin-nav-container {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+          }
+          .admin-actions-side {
+            width: 100%;
+            justify-content: space-between;
           }
         }
       `}</style>
